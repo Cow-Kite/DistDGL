@@ -74,7 +74,3 @@ for step, (input_nodes, seeds, blocks) in enumerate(dataloader):
     batch_inputs = batch_inputs.to(device)
     batch_labels = batch_labels.to(device)
 
-'''
-    질문: 
-    1. batch_inputs.size() 출력 결과 노드의 개수가 이해안됨
-'''
