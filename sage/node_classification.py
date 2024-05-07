@@ -27,7 +27,8 @@ class DistSAGE(nn.Module):
         self.layers.append(dglnn.SAGEConv(n_hidden, n_classes, "mean"))
         self.dropout = nn.Dropout(dropout)
         self.activation = activation
-
+    
+    # blocks = subgraph, x = subgraph.features
     def forward(self, blocks, x):
         h = x
         for i, (layer, block) in enumerate(zip(self.layers, blocks)):
@@ -89,12 +90,12 @@ class DistSAGE(nn.Module):
             g.barrier()
         return x
 
-
+# 출력(pred)과 실제 레이블(labels)을 비교하여 정확도 비교
 def compute_acc(pred, labels):
     labels = labels.long()
     return (th.argmax(pred, dim=1) == labels).float().sum() / len(pred)
 
-
+# Val, Test에 대한 정확도 계산
 def evaluate(model, g, inputs, labels, val_nid, test_nid, batch_size, device):
     model.eval()
     with th.no_grad():
@@ -110,6 +111,7 @@ def run(args, device, data):
     sampler = dgl.dataloading.NeighborSampler(
         [int(fanout) for fanout in args.fan_out.split(",")]
     )
+    # 학습에 필요한 노드 데이터를 로드
     dataloader = dgl.dataloading.DistNodeDataLoader(
         g,
         train_nid,
